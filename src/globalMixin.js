@@ -7,7 +7,17 @@ export default{
         arrow_up_down:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M16 10h6L12 0L2 10h6v4H2l10 10l10-10h-6v-4m-2 6h3l-5 5l-5-5h3V8H7l5-5l5 5h-3v8z" fill="#626262"/></svg>',
         filter_outline:'   <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M15 19.88c.04.3-.06.62-.29.83a.996.996 0 0 1-1.41 0L9.29 16.7a.989.989 0 0 1-.29-.83v-5.12L4.21 4.62a1 1 0 0 1 .17-1.4c.19-.14.4-.22.62-.22h14c.22 0 .43.08.62.22a1 1 0 0 1 .17 1.4L15 10.75v9.13M7.04 5L11 10.06v5.52l2 2v-7.53L16.96 5H7.04z" fill="#626262" /></svg>',
         filter:' <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M14 12v7.88c.04.3-.06.62-.29.83a.996.996 0 0 1-1.41 0l-2.01-2.01a.989.989 0 0 1-.29-.83V12h-.03L4.21 4.62a1 1 0 0 1 .17-1.4c.19-.14.4-.22.62-.22h14c.22 0 .43.08.62.22a1 1 0 0 1 .17 1.4L14.03 12H14z" fill="#626262" /></svg>'
-            }
+            },
+            operations: [
+              { name: "like", operation: "like" },
+              { name: "does not like", operation: "!like" },
+              { name: "equals", operation: "==" },
+              { name: "does not equal", operation: "!=" },
+              { name: "greater than", operation: ">" },
+              { name: "greater than or equal to", operation: ">=" },
+              { name: "less than", operation: "<" },
+              { name: "less than or equal to", operation: "<=" }
+            ]
     }
   },
     methods:{
@@ -38,6 +48,19 @@ export default{
             document.body.removeChild(outer);
         
             return (w1 - w2);
+        }
+        ,
+         compare(post, operator, value) {
+          switch (operator) {
+            case '>':   return post > value;
+            case '<':   return post < value;
+            case '>=':  return post >= value;
+            case '<=':  return post <= value;
+            case '==':  return post == value;
+            case '!=':  return post != value;
+            case 'like': return !!post.toLowerCase().match(new RegExp(value.toLowerCase(),'g'))
+            case '!like': return !!post.toLowerCase().match(new RegExp(value.toLowerCase(),'g'))
+          }
         }
     },
     created:function(){

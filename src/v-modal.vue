@@ -20,7 +20,7 @@
           </div>
 
           <div class="modal-footer">
-            <button class="modal-default-button" @click="$emit('filter-data', { column, filterValue, operation })">
+            <button class="modal-default-button" @click="$emit('filter-data', { column, filterValue, operation:selectedOperation.operation })">
               OK
             </button>
             <button class="modal-default-button" @click="$emit('close')">
@@ -39,19 +39,12 @@ export default {
   components: {
     Datepicker
   },
-  props: ["column"],
+  props: ["column","operations"],
   data: function() {
     return {
       filterValue: "",
       operation: "equals",
-      operations: [
-        { name: "equals", operation: "==" },
-        { name: "does not equal", operation: "!=" },
-        { name: "greater than", operation: ">" },
-        { name: "greater than or equal to", operation: ">=" },
-        { name: "less than", operation: "<" },
-        { name: "less than or equal to", operation: "<=" }
-      ]
+
     };
   },
   computed: {

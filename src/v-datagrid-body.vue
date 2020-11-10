@@ -25,6 +25,11 @@ export default {
   },
   created: function() {
     this.items = this.propItems;
+  },
+  watch:{
+propItems:function(){
+  this.items = this.propItems
+}
   }
 };
 </script>

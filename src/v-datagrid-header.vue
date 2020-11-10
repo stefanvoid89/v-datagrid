@@ -1,6 +1,11 @@
 <template>
   <div class="v-datagrid-header" :style="{ paddingRight: `${scrollbarWidth}px` }">
     <div class="v-datagrid-header-wrapper">
+      <div>
+        <div>
+          <button @click="$emit('remove-filter')">ukloni filtere</button>
+        </div>
+      </div>
       <div class="v-datagrid-header-table">
         <div class="v-datagrid-header-colgroup">
           <div class="v-datagrid-header-col" v-for="column in columns" :key="column.uuid" :style="column.width ? { width: `${column.width}px` } : ''"></div>

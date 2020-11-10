@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="v-datagrid">
-      <v-datagrid-header :propColumns="columns" @sort-by="setSortBy" @show-modal="showModalFilter" :icons="icons"> </v-datagrid-header>
+      <v-datagrid-header :propColumns="columns" @sort-by="setSortBy" @remove-filter="removeFilter" @show-modal="showModalFilter" :icons="icons"> </v-datagrid-header>
       <v-datagrid-body :propColumns="columns" :propItems="computedItems"></v-datagrid-body>
     </div>
-    <v-modal v-if="showModal" @close="showModal = false" :column="filterColumn" @filter-data="filterItems"></v-modal>
+    <v-modal v-if="showModal" @close="showModal = false" :column="filterColumn" @filter-data="filterItems" :operations="operations"></v-modal>
   </div>
 </template>
 
@@ -62,14 +62,60 @@ export default {
   },
   computed: {
     computedItems: function() {
-      return this.items.filterBy(this.filterColumns).sortBy(this.sortBy);
+     return this.filterBy(this.filterColumns,this.items).sortBy(this.sortBy);
     }
   },
 
   methods: {
+
+    removeFilter(){
+
+      this.filterColumns=[]
+    },
+
+filterBy(filterColumns, items){
+
+  if(!filterColumns.length) return items
+  else  {
+    let self = this
+   return items.filter(item => {
+    return filterColumns.every(filterColumn=>{
+ 
+ let itemValue = item[filterColumn.name]
+ let filterValue = filterColumn.filterValue
+let type = filterColumn.type
+ if(type == 'date'){
+itemValue = Date.parse(itemValue)
+ }
+
+
+ else if(typeof itemValue !== 'number') {   
+   itemValue = itemValue.trim().toLowerCase()
+   filterValue = filterValue.trim().toLowerCase()}
+     return self.compare(itemValue, filterColumn.operation,  filterColumn.filterValue)
+
+}) 
+
+})
+  }
+
+},
+
+
     filterItems({ column, filterValue, operation }) {
       // console.log(column, filterValue, operation);
-      this.filterColumns.push({ uuid: column.uuid, filterValue, operation });
+      if(filterValue){
+   this.filterColumns.push({ name: column.name,type:column.type, filterValue, operation });
+
+
+   let columnIndex = this.columns.map((c) => c.name).indexOf(column.name);
+
+ 
+
+      this.$set(this.columns[columnIndex], "filtered", sortOrder);
+
+      }
+   
       this.showModal = false;
     },
     showModalFilter(column) {
