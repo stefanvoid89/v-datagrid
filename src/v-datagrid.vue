@@ -47,10 +47,10 @@ export default {
       this.columns = this.parseColumns(this.propColumns);
     },
     filterColumns: function() {
-      this.items = this.filterBy2(this.filterColumns, this.items).sortBy(this.sortBy);
+      this.items = this.filterBy(this.filterColumns, this.items).sortBy(this.sortBy);
     },
     sortBy: function() {
-      this.items = this.filterBy2(this.filterColumns, this.items).sortBy(this.sortBy);
+      this.items = this.filterBy(this.filterColumns, this.items).sortBy(this.sortBy);
     }
   },
 
@@ -134,29 +134,6 @@ export default {
     },
 
     filterBy(filterColumns, items) {
-      if (!filterColumns.length) return items;
-      else {
-        let self = this;
-        return items.filter((item) => {
-          return filterColumns.every((filterColumn) => {
-            let itemValue = item[filterColumn.name];
-            let filterValue = filterColumn.filterValue;
-            let type = filterColumn.type;
-            if (type == "date") {
-              itemValue = Date.parse(itemValue);
-            } else if (type !== "number") {
-              itemValue = itemValue.trim().toLowerCase();
-              filterValue = filterValue.trim().toLowerCase();
-            }
-            return self.compare(itemValue, filterColumn.operation, filterColumn.filterValue);
-          });
-        });
-      }
-    },
-
-    filterBy2(filterColumns, items) {
-      // if (!filterColumns.length) return items;
-      // else {
       let self = this;
       return items.map((item) => {
         item.visible = filterColumns.every((filterColumn) => {
@@ -173,7 +150,6 @@ export default {
         });
         return item;
       });
-      // }
     },
 
     filterItems({ column, filterValue, operation }) {
