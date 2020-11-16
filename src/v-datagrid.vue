@@ -2,7 +2,7 @@
   <div>
     <div class="v-datagrid">
       <v-datagrid-header :propColumns="columns" @sort-by="setSortBy" @remove-filter="removeFilter" @show-modal="showModalFilter" :icons="icons" :config="config" @add-row="addRow"> </v-datagrid-header>
-      <v-datagrid-body :propColumns="columns" :propItems="computedItems" :config="config" @edit-row="editRow" @delete-row="deleteRow" @cancel-row="cancelRow" @store-row="storeRow"></v-datagrid-body>
+      <v-datagrid-body :propColumns="columns" :propItems="items" :config="config" @edit-row="editRow" @delete-row="deleteRow" @cancel-row="cancelRow" @store-row="storeRow"></v-datagrid-body>
     </div>
     <v-modal v-if="showModal" @close="closeFilterModal" :column="filterColumn" @filter-data="filterItems" :operations="operations"></v-modal>
   </div>
@@ -45,6 +45,12 @@ export default {
     },
     propColumns: function() {
       this.columns = this.parseColumns(this.propColumns);
+    },
+    filterColumns: function() {
+      this.items = this.filterBy2(this.filterColumns, this.items).sortBy(this.sortBy);
+    },
+    sortBy: function() {
+      this.items = this.filterBy2(this.filterColumns, this.items).sortBy(this.sortBy);
     }
   },
 
@@ -83,11 +89,6 @@ export default {
       filterColumns: []
     };
   },
-  computed: {
-    computedItems: function() {
-      return this.filterBy(this.filterColumns, this.items).sortBy(this.sortBy);
-    }
-  },
 
   methods: {
     addRow() {
@@ -99,7 +100,7 @@ export default {
         item[column.name] = value;
       });
 
-      item = { ...{ uuid: nanoid() }, ...item, ...this.defaultColumnConfig, edit: true };
+      item = { ...{ uuid: nanoid(), visible: true }, ...item, ...this.defaultColumnConfig, edit: true };
 
       this.items.unshift(item);
     },
@@ -153,6 +154,28 @@ export default {
       }
     },
 
+    filterBy2(filterColumns, items) {
+      // if (!filterColumns.length) return items;
+      // else {
+      let self = this;
+      return items.map((item) => {
+        item.visible = filterColumns.every((filterColumn) => {
+          let itemValue = item[filterColumn.name];
+          let filterValue = filterColumn.filterValue;
+          let type = filterColumn.type;
+          if (type == "date") {
+            itemValue = Date.parse(itemValue);
+          } else if (type !== "number") {
+            itemValue = itemValue.trim().toLowerCase();
+            filterValue = filterValue.trim().toLowerCase();
+          }
+          return self.compare(itemValue, filterColumn.operation, filterColumn.filterValue);
+        });
+        return item;
+      });
+      // }
+    },
+
     filterItems({ column, filterValue, operation }) {
       let columnIndex = this.columns.map((c) => c.name).indexOf(column.name);
       let filterColumnIndex = this.filterColumns.map((c) => c.name).indexOf(column.name);
@@ -176,7 +199,7 @@ export default {
       return columns;
     },
     parseItems(items) {
-      items = items.map((item) => ({ ...{ uuid: nanoid() }, ...item, ...this.defaultColumnConfig }));
+      items = items.map((item) => ({ ...{ uuid: nanoid(), visible: true }, ...item, ...this.defaultColumnConfig }));
       return items;
     },
     parseDatesInItems() {

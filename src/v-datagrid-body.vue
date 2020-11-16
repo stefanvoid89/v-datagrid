@@ -5,8 +5,9 @@
         <div class="v-datagrid-body-colgroup">
           <div class="v-datagrid-body-col" v-for="column in propColumns" :key="column.uuid" :style="column.width ? { width: `${column.width}` } : ''"></div>
         </div>
-
-        <v-datagrid-row v-for="item in items" :key="item.uuid" :propItem="item" :propColumns="propColumns" :config="config" @edit-row="edit" @delete-row="remove" @cancel-row="cancel" @store-row="store"> </v-datagrid-row>
+        <template v-for="item in items">
+          <v-datagrid-row v-if="item.visible" :key="item.uuid" :propItem="item" :propColumns="propColumns" :config="config" @edit-row="edit" @delete-row="remove" @cancel-row="cancel" @store-row="store"> </v-datagrid-row>
+        </template>
       </div>
     </div>
   </div>
