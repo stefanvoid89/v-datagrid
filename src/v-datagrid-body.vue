@@ -3,10 +3,10 @@
     <div class="v-datagrid-body-wrapper">
       <div class="v-datagrid-body-table">
         <div class="v-datagrid-body-colgroup">
-          <div class="v-datagrid-body-col" v-for="column in propColumns" :key="column.uuid" :style="column.width ? { width: `${column.width}px` } : ''"></div>
+          <div class="v-datagrid-body-col" v-for="column in propColumns" :key="column.uuid" :style="column.width ? { width: `${column.width}` } : ''"></div>
         </div>
 
-        <v-datagrid-row v-for="item in items" :key="item.uuid" :propItem="item" :propColumns="propColumns"> </v-datagrid-row>
+        <v-datagrid-row v-for="item in items" :key="item.uuid" :propItem="item" :propColumns="propColumns" :config="config" @edit-row="edit" @delete-row="remove" @cancel-row="cancel" @store-row="store"> </v-datagrid-row>
       </div>
     </div>
   </div>
@@ -17,7 +17,7 @@ import VDatagridRow from "./v-datagrid-row";
 export default {
   components: { VDatagridRow },
   name: "v-datagrid-body",
-  props: ["propItems", "propColumns"],
+  props: ["propItems", "propColumns", "config"],
   data: function() {
     return {
       items: []
@@ -26,10 +26,24 @@ export default {
   created: function() {
     this.items = this.propItems;
   },
-  watch:{
-propItems:function(){
-  this.items = this.propItems
-}
+  methods: {
+    store({ uuid, item }) {
+      this.$emit("store-row", { uuid, item });
+    },
+    cancel(uuid) {
+      this.$emit("cancel-row", uuid);
+    },
+    edit(uuid) {
+      this.$emit("edit-row", uuid);
+    },
+    remove(uuid) {
+      this.$emit("remove-row", uuid);
+    }
+  },
+  watch: {
+    propItems: function() {
+      this.items = this.propItems;
+    }
   }
 };
 </script>

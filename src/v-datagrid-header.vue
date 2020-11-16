@@ -8,7 +8,7 @@
       </div>
       <div class="v-datagrid-header-table">
         <div class="v-datagrid-header-colgroup">
-          <div class="v-datagrid-header-col" v-for="column in columns" :key="column.uuid" :style="column.width ? { width: `${column.width}px` } : ''"></div>
+          <div class="v-datagrid-header-col" v-for="column in columns" :key="column.uuid" :style="column.width ? { width: `${column.width}` } : ''"></div>
         </div>
         <div class="v-datagrid-header-row">
           <div class="v-datagrid-header-cell" v-for="column in columns" :key="column.uuid">
@@ -30,6 +30,11 @@
               </div>
             </div>
           </div>
+          <div v-if="config.editable || config.delitable || config.appendable" class="v-datagrid-header-cell">
+            <div style="display: flex;justify-content:space-between">
+              <div v-if="config.appendable"><button @click="addRow">Dodaj novi red</button></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -41,7 +46,7 @@ import { nanoid } from "nanoid";
 import globalMixin from "./globalMixin";
 export default {
   mixins: [globalMixin],
-  props: ["propColumns"],
+  props: ["propColumns", "config"],
   data: function() {
     return {
       columns: [],
@@ -60,6 +65,9 @@ export default {
     }
   },
   methods: {
+    addRow() {
+      this.$emit("add-row");
+    },
     sortBy(column) {
       this.$emit("sort-by", column);
     },

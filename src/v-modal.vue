@@ -9,7 +9,7 @@
             <div style="display:flex">
               <div>
                 <select v-model="operation">
-                  <option v-for="operation in operations" :key="operation.name" :value="operation.name">{{ operation.name }}</option>
+                  <option v-for="operation in operationsByType" :key="operation.name" :value="operation.name">{{ operation.name }}</option>
                 </select>
               </div>
               <div>
@@ -20,7 +20,7 @@
           </div>
 
           <div class="modal-footer">
-            <button class="modal-default-button" @click="$emit('filter-data', { column, filterValue, operation:selectedOperation.operation })">
+            <button class="modal-default-button" @click="$emit('filter-data', { column, filterValue, operation: selectedOperation.operation })">
               OK
             </button>
             <button class="modal-default-button" @click="$emit('close')">
@@ -39,17 +39,48 @@ export default {
   components: {
     Datepicker
   },
-  props: ["column","operations"],
+  props: { column: Object, operations: Array },
   data: function() {
     return {
       filterValue: "",
-      operation: "equals",
-
+      operation: ""
     };
+  },
+  created: function() {
+    let operation = this.operations.find((o) => o.operation === this.column.operation);
+    if (operation) this.operation = operation.name;
+    else {
+      let type = this.column.type || "string";
+      if (type == "date" || type == "number") this.operation = "equals";
+      else this.operation = "like";
+    }
+
+    this.filterValue = this.column.filterValue;
   },
   computed: {
     selectedOperation() {
       return this.operations.find((operation) => operation.name === this.operation);
+    },
+
+    operationsByType() {
+      let diff;
+
+      let type = this.column.type || "string";
+
+      if (type == "date" || type == "number")
+        diff = [
+          { name: "like", operation: "like" },
+          { name: "does not like", operation: "!like" }
+        ];
+      else
+        diff = [
+          { name: "greater than", operation: ">" },
+          { name: "greater than or equal to", operation: ">=" },
+          { name: "less than", operation: "<" },
+          { name: "less than or equal to", operation: "<=" }
+        ];
+
+      return this.operations.filter((op) => diff.every((o) => o.operation !== op.operation));
     }
   }
 };
